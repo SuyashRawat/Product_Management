@@ -1,3 +1,7 @@
+To run rabbitmq on docker
+docker pull rabbitmq:management
+docker run -d -p 5672:5672 -p 15672:15672 --name rabbitmq rabbitmq:management
+
 To create users(post)->localhost:9000/users
 ![create user](https://github.com/user-attachments/assets/5987ae89-dbb7-4f15-bedc-1edf6ba745e8)
 
