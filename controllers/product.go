@@ -115,6 +115,12 @@ func (uc *ProductController) DeleteProduct(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	_, err = uc.productRepo.Getproduct(objectID)
+	if err != nil {
+		http.Error(w, "Product not found", http.StatusNotFound)
+		return
+	}
+
 	err = uc.productRepo.Deleteproduct(objectID)
 	if err != nil {
 		http.Error(w, "Error deleting product", http.StatusInternalServerError)
@@ -126,59 +132,29 @@ func (uc *ProductController) DeleteProduct(w http.ResponseWriter, r *http.Reques
 }
 
 func (uc *ProductController) ValidateProduct(id string, quantity int) bool {
-	// id := p.ByName("id")
+
 	log.Println(id, " ", quantity)
-	// a := 1
 	_, err := primitive.ObjectIDFromHex(id)
-	// log.Println(a)
 	if err != nil {
 		return false
 	}
 	var product models.Product
-
-	// json.NewDecoder(r.Body).Decode(&product)
-
-	// log.Println(a)
-	// quantity := product.Quantity
 	objectID, errr := primitive.ObjectIDFromHex(id)
 	if errr != nil {
-		// http.Error(w, "product not found", http.StatusNotFound)
-		// fmt.Fprintf(w, "false")
 		return false
 	}
-	// log.Println(a)/
 	dbproduct, err := uc.productRepo.Getproduct(objectID)
 	if err != nil {
-		// http.Error(w, "product not found", http.StatusNotFound)
-		// fmt.Fprintf(w, "false")
 		return false
 	}
-	// log.Println(a)
 	if dbproduct.Quantity < quantity {
-		// http.Error(w, "not enough items in stock", http.StatusInternalServerError)
-		// fmt.Fprintf(w, "false")
 		return false
 	}
-	// log.Println(a)
 	dbproduct.Quantity -= quantity
 	err = uc.productRepo.Updateproduct(objectID, dbproduct)
 	if err != nil {
-		// http.Error(w, "Error updating product", http.StatusInternalServerError)
-		// fmt.Fprintf(w, "false")
 		return false
 	}
-
-	// log.Println(a)
 	_, err = json.Marshal(product)
-	if err != nil {
-		// http.Error(w, "Error encoding response", http.StatusInternalServerError)
-		// fmt.Fprintf(w, "false")
-		return false
-	}
-	// log.Println(a)
-	// w.Header().Set("Content-Type", "application/json")
-	// w.WriteHeader(http.StatusFound)
-
-	// fmt.Fprintf(w, "true")
-	return true
+	return err == nil
 }

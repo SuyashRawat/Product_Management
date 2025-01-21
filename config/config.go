@@ -23,6 +23,6 @@ func ConnectToDB() (*mongo.Client, error) {
 		return nil, err
 	}
 
-	fmt.Println("Successfully connected to MongoDB\n\n")
+	fmt.Print("Successfully connected to MongoDB\n\n")
 	return client, nil
 }

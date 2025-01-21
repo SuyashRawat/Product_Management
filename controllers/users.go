@@ -131,28 +131,16 @@ func (uc *UserController) DeleteUser(w http.ResponseWriter, r *http.Request, p h
 }
 
 func (uc *UserController) Validateuser(id string) bool {
-	// id := p.ByName("id")
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		// http.Error(w, "Invalid user ID", http.StatusBadRequest)
-		// fmt.Fprintf(w, "false")
 		return false
 	}
 
 	user, err := uc.userRepo.GetUser(objectID)
 	if err != nil {
-		// http.Error(w, "no user found with this id", http.StatusInternalServerError)
-		// fmt.Fprintf(w, "false")
 		return false
 	}
 
 	_, err = json.Marshal(user)
-	if err != nil {
-		// http.Error(w, "Error encoding response", http.StatusInternalServerError)
-		return false
-	}
-	return true
-	// w.Header().Set("Content-Type", "application/json")
-	// w.WriteHeader(http.StatusFound)
-	// fmt.Fprintf(w, "true")
+	return err == nil
 }

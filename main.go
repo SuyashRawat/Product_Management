@@ -13,11 +13,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-// var userRepo *repository.UserRepository
-// var productRepo *repository.ProductRepository
-// var userController *controllers.UserController
-// var productController *controllers.ProductController
-
 func main() {
 	// Connect to MongoDB
 	client, err := config.ConnectToDB()
@@ -41,7 +36,6 @@ func main() {
 	router.POST("/users", userController.CreateUser)
 	router.PUT("/users/:id", userController.UpdateUser)
 	router.DELETE("/users/:id", userController.DeleteUser)
-	// router.GET("/validateuser/:id", userController.Validateuser)
 
 	//product routes
 	router.GET("/products/:id", productController.GetProduct)
@@ -50,23 +44,9 @@ func main() {
 	router.PUT("/products/:id", productController.UpdateProduct)
 	router.DELETE("/products/:id", productController.DeleteProduct)
 
-	go func() {
-		conn, channel, err := consumer.MQConnect()
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer conn.Close()
-		defer channel.Close()
-		log.Println("connected to rabbit mq\n\n")
-		// // Start consuming messages
-		err = consumer.MQConsume(channel)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}()
+	//connecting rabbitmq
+	go consumer.StartRabbitMQ()
 	// Start the server
-	log.Println("Starting server on :9000\n\n")
+	log.Print("Starting server on :9000\n\n")
 	log.Fatal(http.ListenAndServe(":9000", router))
-
-	//consumer code for rabbit mq
 }

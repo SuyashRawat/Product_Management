@@ -16,13 +16,12 @@ import (
 type Order struct {
 	ProductId string `json:"productID"`
 	Quantity  int    `json:"quantity"`
-	UserId    string `json:"userID"1`
+	UserId    string `json:"userID"`
 }
 
 // Function to connect to RabbitMQ
 func MQConnect() (*amqp.Connection, *amqp.Channel, error) {
 	// Connect to RabbitMQ
-	// log.Println("andar agaye")
 	url := "amqp://guest:guest@localhost:5672/"
 	conn, err := amqp.Dial(url)
 	if err != nil {
@@ -92,18 +91,16 @@ func MQConsume(channel *amqp.Channel) error {
 		fmt.Printf("product: %s ", regData.ProductId)
 		fmt.Printf("Quantity: %d ", regData.Quantity)
 		fmt.Printf("Userid: %s \n", regData.UserId)
-		if userController.Validateuser(regData.UserId) == false {
-			log.Println("user updation not being done\n\n")
+		if !userController.Validateuser(regData.UserId) {
+			log.Print("user updation not being done\n\n")
 			continue
 		}
-		// log.Println("user updation being done(if product will )")
 		go func() {
 			val := productController.ValidateProduct(regData.ProductId, regData.Quantity)
-			// log.Print("%d->", i, val)
 			if val {
-				log.Println("value in db updated\n\n")
+				log.Print("value in db updated\n\n")
 			} else {
-				log.Println("no update was done for this query\n\n")
+				log.Print("no update was done for this query\n\n")
 			}
 		}()
 		i++
@@ -111,4 +108,18 @@ func MQConsume(channel *amqp.Channel) error {
 	}
 
 	return nil
+}
+func StartRabbitMQ() {
+	conn, channel, err := MQConnect()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Close()
+	defer channel.Close()
+	log.Print("connected to rabbit mq\n\n")
+
+	err = MQConsume(channel)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
